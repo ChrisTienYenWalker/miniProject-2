@@ -18,13 +18,16 @@ typedef struct user_t
 
 int main(int arguments, char *inputs[])
 {
+    //inputs should be filename, name, time, longitude, latitude, altitude
     // makes sure that the user enters the right data
     if (arguments >= 5)
     {
         // check if the first input is a character
         if (inputs[1][0] > 40 && inputs[1][0] < 122)
         {
+            char *ptr;
             // char *text = read("sample_users.txt");
+            user_t our_user = {strtod(inputs[5], &ptr), strtod(inputs[2], &ptr), strtod(inputs[3], &ptr), strtod(inputs[4], &ptr), inputs[1]};
             FILE *txtfile;
             char text[20];
             long bytes;
@@ -39,7 +42,6 @@ int main(int arguments, char *inputs[])
             const char *name;
             struct user_t other_users[50];
             double time, logitude, latitude, altitude;
-            char *ptr;
             int arraypositionCounter = 0;
             while (fgets(text, 20, txtfile))
             {
