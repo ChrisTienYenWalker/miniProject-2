@@ -5,15 +5,16 @@
 #include <math.h>
 #define _OPEN_SYS_ITOA_EXT
 
-char *read(char *);
-
+struct user_t scan_user(char*, double, double, double, double);
+double distanceDifference(double, double, double, double, double, double);
+int search(int, user_t, double[]);
 typedef struct user_t
 {
     double altitude;
     double time;
     double longitude;
     double latitude;
-    const char *name[50];
+    char *name[50];
 };
 
 int main(int arguments, char *inputs[])
@@ -27,7 +28,7 @@ int main(int arguments, char *inputs[])
         {
             char *ptr;
             // char *text = read("sample_users.txt");
-            user_t our_user = {strtod(inputs[5], &ptr), strtod(inputs[2], &ptr), strtod(inputs[3], &ptr), strtod(inputs[4], &ptr), inputs[1]};
+            user_t our_user = scan_user(inputs[1], strtod(inputs[2], &ptr), strtod(inputs[3], &ptr), strtod(inputs[4], &ptr), strtod(inputs[5], &ptr));
             FILE *txtfile;
             char text[20];
             long bytes;
@@ -39,11 +40,12 @@ int main(int arguments, char *inputs[])
             }
 
             int counter = -1;
-            const char *name;
+            char *name;
             struct user_t other_users[50];
             double time, longitude, latitude, altitude;
             int arraypositionCounter = 0;
             int numberOfUsers;
+            // char *ptr2;
             while (fgets(text, 20, txtfile))
             {
                 if(counter == -1){
@@ -52,7 +54,7 @@ int main(int arguments, char *inputs[])
                     continue;
                 }
                 switch (counter){
-                    case 0:
+                    case 0:        
                         name = text;
                         // printf("%s", text);
                         break;
@@ -70,7 +72,9 @@ int main(int arguments, char *inputs[])
                         altitude = strtod(text, &ptr);
                         counter = -1;
                         // printf("%f", time);
-                        other_users[arraypositionCounter] = {altitude, time, longitude, latitude, name};
+                        // printf("%s", );
+                        other_users[arraypositionCounter] = scan_user(name, time, longitude, latitude, altitude);
+                        printf("%f", other_users[arraypositionCounter].time);
                         arraypositionCounter++;
                         
                         break;
@@ -78,13 +82,37 @@ int main(int arguments, char *inputs[])
                 counter++;
             }
             
-            struct user_t differences[50];
-            for(int i = 0; i<numberOfUsers; i++){
-                differences[i] = {our_user.altitude-other_users[i].altitude, our_user.time-other_users[i].time, our_user.longitude-other_users[i].longitude, our_user.latitude-other_users[i].latitude, (char*) other_users[i].name};
-            }
             fclose(txtfile);
+
+            double differences[50];
+            for(int i = 0; i<numberOfUsers; i++){
+                double distance = distanceDifference(other_users[i].longitude, our_user.longitude, other_users[i].latitude, our_user.latitude, other_users[i].altitude, other_users[i].altitude);
+                differences[i] = distance;
+            }
+
+            int closest = search(numberOfUsers, our_user, differences);
+            printf("closest: %s", other_users[1].name);
 
         }
     }
 }
 
+user_t scan_user(char* name, double time, double longitude, double latitude, double altitude){
+    return user_t{altitude, time, longitude, latitude, name};
+}
+
+double distanceDifference(double longA, double longB, double latA, double latB, double altA, double altB){
+    return sqrt((longA-longB)*(longA-longB) + (latA-latB)*(latA-latB) + (altA-altB));
+}
+
+int search(int numberOfUsers, user_t user, double otherUsers[] ){
+            int closest = 0;
+            double closestDistance = otherUsers[0];
+            for(int i = 1; i < numberOfUsers; i++){
+                if(closestDistance > otherUsers[i]){
+                    closestDistance = otherUsers[i];
+                    closest = i;
+                }
+            }
+            return closest;
+}
