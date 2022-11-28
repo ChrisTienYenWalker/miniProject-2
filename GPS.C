@@ -3,116 +3,197 @@
 #include <string.h>
 #include <stdint.h>
 #include <math.h>
-#define _OPEN_SYS_ITOA_EXT
+// #define _OPEN_SYS_ITOA_EXT
 
-struct user_t scan_user(char*, double, double, double, double);
-double distanceDifference(double, double, double, double, double, double);
-int search(int, user_t, double[]);
-typedef struct user_t
+typedef struct 
 {
-    double altitude;
     double time;
     double longitude;
     double latitude;
-    char *name[50];
-};
+    double altitude;
+    char name[50];
+} user_t;
 
-int main(int arguments, char *inputs[])
+int search(int numberOfUsers, user_t user, double otherUsers[]);
+user_t scan_user();
+double distanceDifference(double, double, double, double, double, double);
+int scanFile(void);
+int scanManual(void);
+ 
+// int search(int, user_t, double[]);
+
+int main()
 {
-    //inputs should be filename, name, time, longitude, latitude, altitude
-    // makes sure that the user enters the right data
-    if (arguments >= 6)
+
+    // check if the first input is a character
+    char scanFromFile;
+    printf("Would you like to scan from console: Y/N\n");
+    scanf("%c", &scanFromFile);
+    if (scanFromFile == 'N')
     {
-        // check if the first input is a character
-        if (inputs[1][0] > 40 && inputs[1][0] < 122)
-        {
-            char *ptr;
-            // char *text = read("sample_users.txt");
-            user_t our_user = scan_user(inputs[1], strtod(inputs[2], &ptr), strtod(inputs[3], &ptr), strtod(inputs[4], &ptr), strtod(inputs[5], &ptr));
-            FILE *txtfile;
-            char text[20];
-            long bytes;
-            txtfile = fopen("sample_users.txt", "r");
-
-            if (txtfile == NULL)
-            {
-                printf("File Empty");
-            }
-
-            int counter = -1;
-            char *name;
-            struct user_t other_users[50];
-            double time, longitude, latitude, altitude;
-            int arraypositionCounter = 0;
-            int numberOfUsers;
-            // char *ptr2;
-            while (fgets(text, 20, txtfile))
-            {
-                if(counter == -1){
-                    numberOfUsers = atoi(text);
-                    counter++;
-                    continue;
-                }
-                switch (counter){
-                    case 0:        
-                        name = text;
-                        // printf("%s", text);
-                        break;
-                    case 1:
-                        time = strtod(text, &ptr);
-                        // printf("%f", time);
-                        break;
-                    case 2:
-                        longitude = strtod(text, &ptr);
-                        break;
-                    case 3:
-                        latitude = strtod(text, &ptr);
-                        break;
-                    case 4:
-                        altitude = strtod(text, &ptr);
-                        counter = -1;
-                        // printf("%f", time);
-                        // printf("%s", );
-                        other_users[arraypositionCounter] = scan_user(name, time, longitude, latitude, altitude);
-                        printf("%f", other_users[arraypositionCounter].time);
-                        arraypositionCounter++;
-                        
-                        break;
-                }
-                counter++;
-            }
-            
-            fclose(txtfile);
-
-            double differences[50];
-            for(int i = 0; i<numberOfUsers; i++){
-                double distance = distanceDifference(other_users[i].longitude, our_user.longitude, other_users[i].latitude, our_user.latitude, other_users[i].altitude, other_users[i].altitude);
-                differences[i] = distance;
-            }
-
-            int closest = search(numberOfUsers, our_user, differences);
-            printf("closest: %s", other_users[1].name);
-
-        }
+        scanManual();
+        
+        return 0;
+    }
+    else if (scanFromFile == 'Y')
+    {
+        scanFile();
+    }
+    else
+    {
+        printf("Not an option");
+        return 0;
     }
 }
 
-user_t scan_user(char* name, double time, double longitude, double latitude, double altitude){
-    return user_t{altitude, time, longitude, latitude, name};
+int scanManual(void){
+    user_t allUsers[100];
+        printf("Enter your user data: ");
+        allUsers[0] = scan_user();
+        int numberOfOtherUsers;
+        int numberOfUsers = 1;
+        printf("How many other users do you want to add: ");
+        scanf("%d", &numberOfOtherUsers);
+        numberOfUsers = numberOfOtherUsers+1;
+        for (int i = 0; i < numberOfOtherUsers; i++)
+        {
+            printf("Enter other user #%d data: ", i+1);
+            allUsers[i] = scan_user();
+        }
+
+        double differences[50];
+        for (int i = 0; i < numberOfUsers; i++)
+        {
+            double distance = distanceDifference(allUsers[i + 1].longitude, allUsers[0].longitude, allUsers[i + 1].latitude, allUsers[0].latitude, allUsers[i + 1].altitude, allUsers[0].altitude);
+            differences[i] = distance;
+            // printf("%lf\n", differences[i] );
+            // printf("%s", allUsers[i + 1].name);
+        }
+
+        int closest = search(numberOfUsers, allUsers[0], differences);
+        
+        printf("\nClosest: ");
+        printf("Name: %s", allUsers[closest].name);
+        printf("Time: %.2lf\n", allUsers[closest].time);
+        printf("Longitude: %.2lf\n", allUsers[closest].longitude);
+        printf("Latitude: %.2lf\n", allUsers[closest].latitude);
+        printf("Altitude: %.2lf\n", allUsers[closest].altitude);
+        printf("Distance: %.2lf\n", differences[closest]);
+
+}
+user_t scan_user()
+{
+    user_t user;
+    printf("\nEnter name: ");
+    scanf("%s", &user.name);
+    printf("Enter time: ");
+    scanf("%lf", &user.time);
+    printf("Enter longitude: ");
+    scanf("%lf", &user.longitude);
+    printf("Enter latitude: ");
+    scanf("%lf", &user.latitude);
+    printf("Enter altitude: ");
+    scanf("%lf", &user.altitude);
+    return user;
 }
 
-double distanceDifference(double longA, double longB, double latA, double latB, double altA, double altB){
-    return sqrt((longA-longB)*(longA-longB) + (latA-latB)*(latA-latB) + (altA-altB));
+double distanceDifference(double longA, double longB, double latA, double latB, double altA, double altB)
+{
+    return sqrt((longA - longB) * (longA - longB) + (latA - latB) * (latA - latB) + (altA - altB) * (altA - altB));
 }
 
-int search(int numberOfUsers, user_t user, double otherUsers[] ){
-            int closest = 0;
-            double closestDistance = otherUsers[0];
-            for(int i = 1; i < numberOfUsers; i++){
-                if(closestDistance > otherUsers[i]){
-                    closestDistance = otherUsers[i];
-                    closest = i;
-                }
+int search(int numberOfOtherUsers, user_t user, double otherUsers[])
+{
+    int closest = 0;
+    double closestDistance = otherUsers[0];
+    for (int i = 0; i < numberOfOtherUsers; i++)
+    {
+        if (closestDistance > otherUsers[i])
+        {
+            closestDistance = otherUsers[i];
+            closest = i;
+        }
+    }
+    return closest+1;
+}
+
+int scanFile(void){
+    user_t allUsers[100];
+
+        char *ptr;
+        // char *text = read("sample_users.txt");
+        FILE *txtfile;
+        char text[20];
+        long bytes;
+        char filename[50];
+        printf("Enter file name: ");
+        scanf("%s", filename);
+        txtfile = fopen(filename, "r");
+
+        if (txtfile == NULL)
+        {
+            printf("File Empty");
+            return 0;
+        }
+
+        int counter = -1;
+        int numberOfUsers = 0;
+        int arraypositionCounter = 0;
+        // char *ptr2;
+        while (fgets(text, 20, txtfile))
+        {
+            if (counter == -1)
+            {
+                numberOfUsers = atoi(text);
+                counter++;
+                continue;
             }
-            return closest;
+            switch (counter)
+            {
+            case 0:
+                strcpy(allUsers[arraypositionCounter].name, text);
+                // printf("%s", text);
+                break;
+            case 1:
+                allUsers[arraypositionCounter].time = strtod(text, &ptr);
+                // printf("%f", time);
+                break;
+            case 2:
+                allUsers[arraypositionCounter].longitude = strtod(text, &ptr);
+                break;
+            case 3:
+                allUsers[arraypositionCounter].latitude = strtod(text, &ptr);
+                break;
+            case 4:
+                allUsers[arraypositionCounter].altitude = strtod(text, &ptr);
+                counter = -1;
+                // printf("%f", time);
+                // printf("%s", );
+                // printf("%f", other_users[arraypositionCounter].time);
+                arraypositionCounter++;
+
+                break;
+            }
+            counter++;
+        }
+        fclose(txtfile);
+
+        double differences[50];
+        for (int i = 0; i < numberOfUsers; i++)
+        {
+        double distance = distanceDifference(allUsers[i + 1].longitude, allUsers[0].longitude, allUsers[i + 1].latitude, allUsers[0].latitude, allUsers[i + 1].altitude, allUsers[0].altitude);
+            differences[i] = distance;
+            // printf("%lf\n", differences[i] );
+            // printf("%s", allUsers[i + 1].name);
+        }
+
+        int closest = search(numberOfUsers, allUsers[0], differences);
+        
+        printf("\nClosest: ");
+        printf("Name: %s", allUsers[closest].name);
+        printf("Time: %.2lf\n", allUsers[closest].time);
+        printf("Longitude: %.2lf\n", allUsers[closest].longitude);
+        printf("Latitude: %.2lf\n", allUsers[closest].latitude);
+        printf("Altitude: %.2lf\n", allUsers[closest].altitude);
+        printf("Distance: %.2lf\n", differences[closest]);
 }
