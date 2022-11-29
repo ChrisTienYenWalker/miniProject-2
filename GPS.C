@@ -57,28 +57,28 @@ int scanManual(void){
         numberOfUsers = numberOfOtherUsers+1;
         for (int i = 1; i < numberOfUsers; i++)
         {
-            printf("Enter other user #%d data: ", i+1);
+            printf("Enter other user #%d data: ", i);
             allUsers[i] = scan_user();
         }
 
         double differences[50];
-        for(int i = 0; i < numberOfUsers; i++){
-            printf("Name: %s\n", allUsers[i].name);
-            printf("Time: %.2lf\n", allUsers[i].time);
-            printf("Longitude: %.2lf\n", allUsers[i].longitude);
-            printf("Latitude: %.2lf\n", allUsers[i].latitude);
-            printf("Altitude: %.2lf\n", allUsers[i].altitude);
-        }
+        // for(int i = 0; i < numberOfUsers; i++){
+        //     printf("Name: %s\n", allUsers[i].name);
+        //     printf("Time: %.2lf\n", allUsers[i].time);
+        //     printf("Longitude: %.2lf\n", allUsers[i].longitude);
+        //     printf("Latitude: %.2lf\n", allUsers[i].latitude);
+        //     printf("Altitude: %.2lf\n", allUsers[i].altitude);
+        // }
         for (int i = 0; i < numberOfOtherUsers; i++)
         {
             double distance = distanceDifference(allUsers[i + 1].longitude, allUsers[0].longitude, allUsers[i + 1].latitude, allUsers[0].latitude, allUsers[i + 1].altitude, allUsers[0].altitude);
             differences[i] = distance;
-            printf("%lf\n", differences[i] );
-            printf("%s", allUsers[i + 1].name);
+            // printf("%lf\n", differences[i] );
+            // printf("%s", allUsers[i + 1].name);
         }
 
 
-        int closest = search(numberOfOtherUsers, allUsers[0], differences)+1;
+        int closest = search(numberOfOtherUsers, allUsers[0], differences);
         printf("%d", closest);
         
         printf("\nClosest: \n");
@@ -192,7 +192,7 @@ int scanFile(void){
         {
         double distance = distanceDifference(allUsers[i + 1].longitude, allUsers[0].longitude, allUsers[i + 1].latitude, allUsers[0].latitude, allUsers[i + 1].altitude, allUsers[0].altitude);
             differences[i] = distance;
-            printf("%lf\n", differences[i] );
+            // printf("%lf\n", differences[i] );
             // printf("%s", allUsers[i + 1].name);
         }
 
