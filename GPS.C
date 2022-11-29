@@ -29,13 +29,13 @@ int main()
     char scanFromFile;
     printf("Would you like to scan from console: Y/N\n");
     scanf("%c", &scanFromFile);
-    if (scanFromFile == 'N')
+    if (scanFromFile == 'Y')
     {
         scanManual();
         
         return 0;
     }
-    else if (scanFromFile == 'Y')
+    else if (scanFromFile == 'N')
     {
         scanFile();
     }
@@ -55,25 +55,34 @@ int scanManual(void){
         printf("How many other users do you want to add: ");
         scanf("%d", &numberOfOtherUsers);
         numberOfUsers = numberOfOtherUsers+1;
-        for (int i = 0; i < numberOfOtherUsers; i++)
+        for (int i = 1; i < numberOfUsers; i++)
         {
             printf("Enter other user #%d data: ", i+1);
             allUsers[i] = scan_user();
         }
 
         double differences[50];
-        for (int i = 0; i < numberOfUsers; i++)
+        for(int i = 0; i < numberOfUsers; i++){
+            printf("Name: %s\n", allUsers[i].name);
+            printf("Time: %.2lf\n", allUsers[i].time);
+            printf("Longitude: %.2lf\n", allUsers[i].longitude);
+            printf("Latitude: %.2lf\n", allUsers[i].latitude);
+            printf("Altitude: %.2lf\n", allUsers[i].altitude);
+        }
+        for (int i = 0; i < numberOfOtherUsers; i++)
         {
             double distance = distanceDifference(allUsers[i + 1].longitude, allUsers[0].longitude, allUsers[i + 1].latitude, allUsers[0].latitude, allUsers[i + 1].altitude, allUsers[0].altitude);
             differences[i] = distance;
-            // printf("%lf\n", differences[i] );
-            // printf("%s", allUsers[i + 1].name);
+            printf("%lf\n", differences[i] );
+            printf("%s", allUsers[i + 1].name);
         }
 
-        int closest = search(numberOfUsers, allUsers[0], differences);
+
+        int closest = search(numberOfOtherUsers, allUsers[0], differences)+1;
+        printf("%d", closest);
         
-        printf("\nClosest: ");
-        printf("Name: %s", allUsers[closest].name);
+        printf("\nClosest: \n");
+        printf("Name: %s\n", allUsers[closest].name);
         printf("Time: %.2lf\n", allUsers[closest].time);
         printf("Longitude: %.2lf\n", allUsers[closest].longitude);
         printf("Latitude: %.2lf\n", allUsers[closest].latitude);
