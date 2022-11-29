@@ -78,7 +78,7 @@ int scanManual(void){
         printf("Longitude: %.2lf\n", allUsers[closest].longitude);
         printf("Latitude: %.2lf\n", allUsers[closest].latitude);
         printf("Altitude: %.2lf\n", allUsers[closest].altitude);
-        printf("Distance: %.2lf\n", differences[closest]);
+        printf("Distance: %.2lf\n", differences[closest-1]);
 
 }
 user_t scan_user()
@@ -183,7 +183,7 @@ int scanFile(void){
         {
         double distance = distanceDifference(allUsers[i + 1].longitude, allUsers[0].longitude, allUsers[i + 1].latitude, allUsers[0].latitude, allUsers[i + 1].altitude, allUsers[0].altitude);
             differences[i] = distance;
-            // printf("%lf\n", differences[i] );
+            printf("%lf\n", differences[i] );
             // printf("%s", allUsers[i + 1].name);
         }
 
@@ -195,5 +195,5 @@ int scanFile(void){
         printf("Longitude: %.2lf\n", allUsers[closest].longitude);
         printf("Latitude: %.2lf\n", allUsers[closest].latitude);
         printf("Altitude: %.2lf\n", allUsers[closest].altitude);
-        printf("Distance: %.2lf\n", differences[closest]);
+        printf("Distance: %.2lf\n", differences[closest-1]);
 }
