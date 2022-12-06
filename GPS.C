@@ -194,6 +194,7 @@ int scanFile(void){
             differences[i] = distance;
             // printf("%lf\n", differences[i] );
             // printf("%s", allUsers[i + 1].name);
+
         }
 
         int closest = search(numberOfUsers, allUsers[0], differences);
